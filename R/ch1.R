@@ -7,7 +7,7 @@ library(stargazer) # Well-Formatted Regression and Summary Statistics Tables
 # Load the data
 mc_mode_choice <- read_csv(system.file("extdata", "mc_commute.csv", package = "discrtr"))
 
-stargazer(as.data.frame(mc_mode_choice[,1:5]),
+stargazer(as.data.frame(mc_mode_choice[, 1:5]),
           # change the type to text, html, or latex depending on the desired output type = "latex",
           header = FALSE, # do not print package version info in the output
           title = "Example of a table with summary statistics", # Title of table
@@ -53,13 +53,13 @@ time.Active.clean <- mc_mode_choice %>% # Pipe data frame `mc_mode_choice`
 
 # plot the data
 ggplot(data = time.Active.clean) +
-  geom_area(aes(x=timecycle),
-             stat = "bin",
-             binwidth = 5,
-             fill = "blue",
-             color = "blue",
-             alpha = 0.6) +
-  geom_area(aes(x=timewalk),
+  geom_area(aes(x = timecycle),
+            stat = "bin",
+            binwidth = 5,
+            fill = "blue",
+            color = "blue",
+            alpha = 0.6) +
+  geom_area(aes(x = timewalk),
             stat = "bin",
             binwidth = 5,
             fill = "yellow",
@@ -70,18 +70,18 @@ ggplot(data = time.Active.clean) +
 # The pipe operator `%>%` takes an object and passes it on
 # to the next function where it is used as the first argument
 mc_mode_choice %>%
-# `select()` retrieves columns from a data frame
-select(c("choice", "side_den")) %>%
+  # `select()` retrieves columns from a data frame
+  select(c("choice", "side_den")) %>%
   summary()
 
 
 # Pipe the table to `ggplot()` where it is assumed to be the # first argument of the function, i.e., data
 mc_mode_choice %>%
   # Map `choice` to the x-axis and `side_den` to the y-axis
-  ggplot(aes(x=choice,
-             y=side_den)) +
-    # Add a geometric object of type boxplot
-    geom_boxplot()
+  ggplot(aes(x = choice,
+             y = side_den)) +
+  # Add a geometric object of type boxplot
+  geom_boxplot()
 
 
 #################### EXERCISES ####################
@@ -102,13 +102,13 @@ mean(Mode$cost.rail)
 
 # 7
 ggplot(data = Mode) +
-  geom_area(aes(x=time.car),
+  geom_area(aes(x = time.car),
             stat = "bin",
             binwidth = 2,
             fill = "blue",
             color = "blue",
             alpha = 0.6) +
-  geom_area(aes(x=time.bus),
+  geom_area(aes(x = time.bus),
             stat = "bin",
             binwidth = 2,
             fill = "yellow",
@@ -124,6 +124,6 @@ Mode$cost <- ifelse(Mode$choice == "car", Mode$cost.car,
                                   ifelse(Mode$choice == "rail", Mode$cost.rail, NA))))
 
 Mode %>%
-  ggplot(aes(x=choice,
-             y=cost)) +
+  ggplot(aes(x = choice,
+             y = cost)) +
   geom_boxplot()

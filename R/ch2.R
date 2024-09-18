@@ -13,18 +13,18 @@ mc_commute_wide <- mc_commute_wide %>%
   # the table to convert variables `child` and `vehind` to factors
   # with more informative labels
   mutate(child = factor(child,
-                        levels=c("Yes",
-                                 "No"),
+                        levels = c("Yes",
+                                   "No"),
                         # Give the factor categories more descriptive labels
-                        labels=c("Living with a child",
-                                "Not living with a child")),
-                        # Relabel `vehind` variable
-                        vehind = factor(vehind,
-                        levels=c("No",
-                                  "Yes"),
-                        # Give the factor categories more descriptive labels
-                        labels=c("No ind. vehicle access",
-                                  "Ind. vehicle access")))
+                        labels = c("Living with a child",
+                                   "Not living with a child")),
+         # Relabel `vehind` variable
+         vehind = factor(vehind,
+                         levels = c("No",
+                                    "Yes"),
+                         # Give the factor categories more descriptive labels
+                         labels = c("No ind. vehicle access",
+                                    "Ind. vehicle access")))
 
 summary(mc_commute_wide)
 
@@ -32,8 +32,8 @@ summary(mc_commute_wide)
 mc_commute_wide <- mc_commute_wide %>%
   # Use mutate to create a new variable
   # Function `case_when()` is a vectorized form of if-else statements
-  mutate(Shelters = case_when(Shelters_SD == 1 ~-2,
-                              Shelters_D == 1 ~-1,
+  mutate(Shelters = case_when(Shelters_SD == 1 ~ -2,
+                              Shelters_D == 1 ~ -1,
                               Shelters_A == 1 ~ 1,
                               Shelters_SA == 1 ~ 2,
                               TRUE ~ 0))
@@ -41,14 +41,14 @@ mc_commute_wide <- mc_commute_wide %>%
 mc_commute_wide <- mc_commute_wide %>%
   # Use `mutate()` to modify the content of an existing variable
   mutate(Shelters = factor(Shelters,
-  levels = c(-2, -1, 0, 1, 2),
-  labels = c("Strongly Disagree",
-              "Disagree",
-              "Neutral",
-              "Agree",
-              "Strongly Agree"),
-  # The factor is an ordinal variable
-  ordered = TRUE))
+                           levels = c(-2, -1, 0, 1, 2),
+                           labels = c("Strongly Disagree",
+                                      "Disagree",
+                                      "Neutral",
+                                      "Agree",
+                                      "Strongly Agree"),
+                           # The factor is an ordinal variable
+                           ordered = TRUE))
 
 summary(mc_commute_wide$Shelters)
 
@@ -56,7 +56,7 @@ summary(mc_commute_wide$Shelters)
 mc_commute_wide %>%
   # Create a ggplot object with the table that was piped
   # and map the variable `Shelters` to the x-axis
-  ggplot(aes(x=Shelters)) +
+  ggplot(aes(x = Shelters)) +
   # Add a geometric object of type bar; we do not need
   # to specify the y-axis because the height of the bar
   # will be the statistic for the corresponding categorical
@@ -64,8 +64,8 @@ mc_commute_wide %>%
   geom_bar(color = "black",
            fill = "white") +
   # The function `labs()` adds labels to part of the plot, for instance the x and y axes
-  labs(x="Public transport facilities of good quality",
-        y="Number of respondents")
+  labs(x = "Public transport facilities of good quality",
+       y = "Number of respondents")
 
 # Pipe table `mc_commute_wide`
 mc_commute_wide %>%
@@ -74,12 +74,12 @@ mc_commute_wide %>%
   group_by(Shelters) %>%
   # Summarize: calculate the number n() of cases by
   # category of `Shelters`
-  summarize(n=n()) %>%
+  summarize(n = n()) %>%
   # Pipe the result to `ggplot()`; map `Shelters` to the x-axis # and map the number of cases to y; to create segments map
   # the end of the segment to y = 0 and keep it constant on x, # this will create vertical line
-  ggplot(aes(x=Shelters,
+  ggplot(aes(x = Shelters,
              xend = Shelters,
-             y=n,
+             y = n,
              yend = 0)) +
   # Add geometric featues of type point
   geom_point(color = "black",
@@ -88,8 +88,8 @@ mc_commute_wide %>%
   # Add geometric features of type segment (line segments)
   geom_segment(size = 1) +
   # Label the axes
-    labs(x="Public transport facilities of good quality",
-         y="Number of respondents")
+  labs(x = "Public transport facilities of good quality",
+       y = "Number of respondents")
 
 library(treemapify)
 # Pipe table
@@ -97,7 +97,7 @@ mc_commute_wide %>%
   # Group table based on `choice`
   group_by(choice) %>%
   # Count the number of cases by `choice` and pipe to `ggplot()`
-  summarize(n=n()) %>%
+  summarize(n = n()) %>%
   # Map the color of the rectangles to the variable `choice` and # their area to the number of cases
   ggplot(aes(fill = choice,
              area = n)) +
@@ -105,53 +105,53 @@ mc_commute_wide %>%
   geom_treemap() +
   # Add labels
   labs(title = "Trips by mode",
-       fill="Mode")
+       fill = "Mode")
 
 mc_commute_wide <- mc_commute_wide %>%
   # Use `mutate()` to convert variable `housing` to a factor
   mutate(housing = case_when(shared != "No" ~ "shared",
-                              family != "No" ~ "family",
-                              TRUE ~ "solo"),
-  housing = factor(housing))
-  summary(mc_commute_wide$housing)
+                             family != "No" ~ "family",
+                             TRUE ~ "solo"),
+         housing = factor(housing))
+summary(mc_commute_wide$housing)
 
 ##### Bivariate Analysis #####
 # Pipe table `mc_commute_wide` to `select()`
 mc_commute_wide %>%
   # Select variables `choice` and `sidewalk_density`
   select(choice,
-          sidewalk_density) %>%
-summary()
+         sidewalk_density) %>%
+  summary()
 
 mc_commute_wide %>%
-# Map `choice` to the x-axis and `sidewalk_density` to the y-axis
-ggplot(aes(x=choice,
-y=sidewalk_density)) +
-# Boxplots are useful for visualizing the relationship between
-# one categorical and one quantitative variable
-geom_boxplot() +
-labs(x="Mode",
-# The expression function allows us to include superscripts # and subscripts in labels and titles
-y=expression("Sidewalk density (km/km"^2*")"))
+  # Map `choice` to the x-axis and `sidewalk_density` to the y-axis
+  ggplot(aes(x = choice,
+             y = sidewalk_density)) +
+  # Boxplots are useful for visualizing the relationship between
+  # one categorical and one quantitative variable
+  geom_boxplot() +
+  labs(x = "Mode",
+       # The expression function allows us to include superscripts # and subscripts in labels and titles
+       y = expression("Sidewalk density (km/km"^2 * ")"))
 
 mc_commute_wide %>%
-  ggplot(aes(x=choice,
-             y=sidewalk_density,
+  ggplot(aes(x = choice,
+             y = sidewalk_density,
              # Map the color of the polygons to `choice`
              fill = choice)) +
   # Add a geometric object of type violin
   geom_violin(trim = FALSE) +
   # Add geometric object of type boxplot
   geom_boxplot(width = 0.1,
-              fill = "white") +
-  labs(x="Mode",
-      y=expression("Sidewalk density (km/km"^2*")"), # Add a label for the fill
-      fill = "Mode")
+               fill = "white") +
+  labs(x = "Mode",
+       y = expression("Sidewalk density (km/km"^2 * ")"), # Add a label for the fill
+       fill = "Mode")
 
 library(ggridges)
 mc_commute_wide %>%
-  ggplot(aes(x=sidewalk_density,
-             y=choice,
+  ggplot(aes(x = sidewalk_density,
+             y = choice,
              # Map the color of the polygons to `choice`
              fill = choice)) +
   # Add geometric object of type ridges with jittered points
@@ -161,8 +161,8 @@ mc_commute_wide %>%
                       point_size = 3,
                       point_alpha = 1,
                       alpha = 0.7) +
-  labs(y="Mode",
-       x=expression("Sidewalk density (km/km"^2*")"),
+  labs(y = "Mode",
+       x = expression("Sidewalk density (km/km"^2 * ")"),
        # Add a label for the fill
        fill = "Mode")
 
@@ -175,8 +175,8 @@ balloonplot(as.table(tableau),
             xlab = "Mode",
             ylab = "Dependent minor(s)",
             # Adjust maximum dot size
-            dotsize = 3/max(strwidth(19),
-                            strheight(19)),
+            dotsize = 3 / max(strwidth(19),
+                              strheight(19)),
             # Symbol used for the dots
             dotcolor = "skyblue",
             text.size = 0.65,
@@ -205,8 +205,8 @@ balloonplot(as.table(tableau),
             xlab = "Mode",
             ylab = "Living arrangement",
             # Adjust maximum dot size
-            dotsize = 3/max(strwidth(19),
-                            strheight(19)),
+            dotsize = 3 / max(strwidth(19),
+                              strheight(19)),
             # Symbol used for the dots
             dotcolor = "skyblue",
             text.size = 0.65,
@@ -237,8 +237,8 @@ balloonplot(as.table(tableau),
             xlab = "Living arrangement",
             ylab = "Dependent minor(s)",
             # Adjust maximum dot size
-            dotsize = 3/max(strwidth(19),
-                            strheight(19)),
+            dotsize = 3 / max(strwidth(19),
+                              strheight(19)),
             # Symbol used for the dots
             dotcolor = "skyblue",
             text.size = 0.65,
@@ -264,24 +264,24 @@ mc_commute_wide %>%
   ggplot() +
   # Add geometric object of type mosaic
   # Map the interaction between `choice` and `child` to the x-axis
-  geom_mosaic(aes(x=product(choice,
-                            child),
+  geom_mosaic(aes(x = product(choice,
+                              child),
                   fill = choice)) +
   # Add labels
-  labs(x="Dependent minor(s)",
-       y="Mode",
+  labs(x = "Dependent minor(s)",
+       y = "Mode",
        fill = "Mode")
 
 ggplot(data = mc_commute_wide) +
   # Add geometric object of type mosaic
   # Map the interaction between `choice` and `numna` to the x-axis
-  geom_mosaic(aes(x=product(choice,
-                            numna),
+  geom_mosaic(aes(x = product(choice,
+                              numna),
                   # Color rectangles based on `choice`
                   fill = choice)) +
   # Add labels
-  labs(x="Number of alternatives",
-       y="Mode",
+  labs(x = "Number of alternatives",
+       y = "Mode",
        fill = "Mode")
 
 # Pipe table to next function
@@ -290,30 +290,30 @@ mc_commute_wide %>%
   group_by(choice,
            housing) %>%
   # Calculate number of cases by combination of `choice` and `housing`
-  summarize(n=n(),
+  summarize(n = n(),
             .groups = "drop") %>%
-  ggplot(aes(x=choice,
-             y=housing)) +
+  ggplot(aes(x = choice,
+             y = housing)) +
   # Add geometric object of type tile, map the color
   # of tiles to `n`, the number of cases
   geom_tile(aes(fill = n)) +
   # Add labels
-  labs(x="Mode",
-        y="Living arrangement",
-        fill = "Number of respondents")
+  labs(x = "Mode",
+       y = "Living arrangement",
+       fill = "Number of respondents")
 
 mc_commute_wide %>%
-  ggplot(aes(x=like_active_neighborhood, fill = choice)) +
+  ggplot(aes(x = like_active_neighborhood, fill = choice)) +
   geom_bar(position = "fill") +
-  labs(y="Proportion",
-       x="Like active neighborhood",
-       fill="Mode")
+  labs(y = "Proportion",
+       x = "Like active neighborhood",
+       fill = "Mode")
 
 ##### Multivariate Analysis #####
 mc_commute_wide %>%
-  ggplot(aes(x=sidewalk_density,
+  ggplot(aes(x = sidewalk_density,
              # choice is mapped to the y axis
-             y=choice,
+             y = choice,
              # choice is also mapped to the fill color!
              fill = choice)) +
   # Add geometric object of type density ridges
@@ -322,15 +322,15 @@ mc_commute_wide %>%
                       position = position_points_jitter(width = 0.05, height = 0), point_shape = '|',
                       point_size = 3,
                       point_alpha = 1,
-                      alpha = 0.7)+
+                      alpha = 0.7) +
   # Add labels
-  labs(y="Mode",
-       x=expression("Sidewalk density (km/km"^2*")"),
+  labs(y = "Mode",
+       x = expression("Sidewalk density (km/km"^2 * ")"),
        fill = "Mode")
 
 ggplot(data = mc_commute_wide,
-       aes(x=sidewalk_density,
-           y=choice,
+       aes(x = sidewalk_density,
+           y = choice,
            # By mapping the fill color to `vehind`
            # we introduce an additional data dimension to the plot
            ill = vehind)) +
@@ -340,8 +340,8 @@ ggplot(data = mc_commute_wide,
                       point_size = 3,
                       point_alpha = 1,
                       alpha = 0.7) +
-  labs(y="Mode",
-       x=expression("Sidewalk density (km/km"^2*")"),
+  labs(y = "Mode",
+       x = expression("Sidewalk density (km/km"^2 * ")"),
        fill = "Individual access to a vehicle")
 
 ggplot(data = mc_commute_wide %>%
@@ -349,7 +349,7 @@ ggplot(data = mc_commute_wide %>%
   group_by(choice,
            gender) %>%
   # Summarize to obtain the number of responses by choice-gender combination # and the mean of sidewalk density for each group
-  summarize(n=n(),
+  summarize(n = n(),
             sidewalk_density = mean(sidewalk_density),
             .groups = "drop"),
        # Map the area of the rectangles to the number of responses, the fill color # to mean sidewalk density, and group rectangles by choice
@@ -360,7 +360,7 @@ ggplot(data = mc_commute_wide %>%
   # Create main treemap
   geom_treemap() +
   # Plot borders of subgroups
-  geom_treemap_subgroup_border(size = 5)+
+  geom_treemap_subgroup_border(size = 5) +
   # Add labels
   geom_treemap_subgroup_text(fontface = "bold",
                              colour = "white",
@@ -372,11 +372,11 @@ ggplot(data = mc_commute_wide %>%
                     place = "centre",
                     size = 10,
                     grow = FALSE) +
-  labs(title = "Trips by Mode-Gender and sidewalk density", fill = expression("Sidewalk density (km/km"^2*")"))
+  labs(title = "Trips by Mode-Gender and sidewalk density", fill = expression("Sidewalk density (km/km"^2 * ")"))
 
 mc_commute_wide %>%
-  ggplot(aes(x=sidewalk_density,
-             y=choice,
+  ggplot(aes(x = sidewalk_density,
+             y = choice,
              fill = vehind)) +
   geom_density_ridges(jittered_points = TRUE,
                       bandwidth = 3.5,
@@ -385,82 +385,83 @@ mc_commute_wide %>%
                       point_size = 3,
                       point_alpha = 1,
                       alpha = 0.7) +
-  labs(y="Mode",
-       x=expression("Sidewalk density (km/km"^2*")"),
-       fill = "Individual access to a vehicle")  +
+  labs(y = "Mode",
+       x = expression("Sidewalk density (km/km"^2 * ")"),
+       fill = "Individual access to a vehicle") +
   # `facet_wrap()` creates subplots after partitioning the data set # by the variable(s) specified, in this case `vehind`
-  facet_wrap(~ vehind)
+  facet_wrap(~vehind)
 
 mc_commute_wide %>%
-  ggplot(aes(x=child,
+  ggplot(aes(x = child,
              fill = choice)) +
   geom_bar(position = "fill") +
-  labs(y="Proportion",
-       x="",
-       fill="Mode") +
+  labs(y = "Proportion",
+       x = "",
+       fill = "Mode") +
   # Facet the plots based on `gender`
-  facet_wrap(~ gender)
+  facet_wrap(~gender)
 
 mc_commute_wide %>%
-  ggplot(aes(x=gender,
+  ggplot(aes(x = gender,
              fill = choice)) +
   geom_bar(position = "fill") +
-  labs(y="Proportion",
-       x="Gender",
-       fill="Mode") +
+  labs(y = "Proportion",
+       x = "Gender",
+       fill = "Mode") +
   # Facet the plots based on `child`
-  facet_wrap(~ child)
+  facet_wrap(~child)
 
 mc_commute_wide %>%
-  ggplot(aes(x=gender,
+  ggplot(aes(x = gender,
              fill = choice)) +
   geom_bar(position = "fill") +
-  labs(y="Proportion",
-       x="Gender",
-       fill="Mode") +
+  labs(y = "Proportion",
+       x = "Gender",
+       fill = "Mode") +
   # `facet_grid()` creates a "matrix" of subplots # with the variable on the left spread on the
   # x-axis and the one on the right on the y-axis
   facet_grid(vehind ~ child)
 
 mc_commute_wide %>%
   ggplot() +
-  (aes(x=gender,
+  (aes(x = gender,
        fill = choice)) +
   geom_bar(position = "fill") +
-  labs(y="Proportion",
-       x="Getting there is fun", fill = "Mode") +
-  facet_wrap(~ getting_there_fun)
+  labs(y = "Proportion",
+       x = "Getting there is fun", fill = "Mode") +
+  facet_wrap(~getting_there_fun)
 
 mc_commute_wide %>%
-  ggplot(aes(x=getting_there_fun, fill = choice)) +
+  ggplot(aes(x = getting_there_fun, fill = choice)) +
   geom_bar(position = "fill") +
-  labs(y="Proportion",
-       x="Getting there is fun", fill = "Mode") +
-  facet_wrap(~ child)
+  labs(y = "Proportion",
+       x = "Getting there is fun", fill = "Mode") +
+  facet_wrap(~child)
 
 mc_commute_wide %>%
   ggplot() +
-  geom_mosaic(aes(x=product(choice,
-                            getting_there_fun), fill = choice)) +
-  facet_wrap(~ child)+
-  labs(y="Proportion",
-       x="Getting there is fun",
+  geom_mosaic(aes(x = product(choice,
+                              getting_there_fun), fill = choice)) +
+  facet_wrap(~child) +
+  labs(y = "Proportion",
+       x = "Getting there is fun",
        fill = "Mode")
 
-names(mc_commute_wide)[names(mc_commute_wide) == "numna"]<-"Alternatives" # Renaming variable
+names(mc_commute_wide)[names(mc_commute_wide) == "numna"] <- "Alternatives" # Renaming variable
 mc_commute_wide %>%
-ggplot(aes(x=available.Walk)) +
-  labs(y="Proportion",
-       x="Walk is available") +
-  geom_bar(color="black",
-           fill="white") +
-  facet_wrap(~ Alternatives,
+  ggplot(aes(x = available.Walk)) +
+  labs(y = "Proportion",
+       x = "Walk is available") +
+  geom_bar(color = "black",
+           fill = "white") +
+  facet_wrap(~Alternatives,
              labeller = label_both)
 
 mc_commute_wide %>%
-  ggplot(aes(x=Alternatives)) +
-  labs(y="Proportion",
-       x="Number of alternatives")+ geom_bar(color = "black",
-                                             fill = "white") +
-  facet_wrap(~ available.Walk,
+  ggplot(aes(x = Alternatives)) +
+  labs(y = "Proportion",
+       x = "Number of alternatives") +
+  geom_bar(color = "black",
+           fill = "white") +
+  facet_wrap(~available.Walk,
              labeller = label_both)
