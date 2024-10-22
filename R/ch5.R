@@ -348,3 +348,51 @@ likelihood_plot <- plot_ly(z = ~L, x = ~mu, y = ~beta) %>%
 # but is not run for knitting to pdf
 likelihood_plot
 
+lrtest(model1,
+       model2)
+
+############# Exercises #############
+estimate_by_time <- function(model) {
+  mc_commute_predict <- mc_commute_long[1:160,]
+
+  mc_commute_predict$time <- rep(seq(from = 1, to = 40, by = 1), each = 4)
+
+  mc_commute_predict$sidewalk_density <- median(mc_commute_predict$sidewalk_density, na.rm = TRUE)
+
+  mc_commute_predict %>%
+    data.frame() %>%
+    select(id, choice, time, sidewalk_density) %>%
+    slice_head(n = 12)
+
+  probs <- predict(model, newdata = mc_commute_predict)
+  print(probs)
+
+  probs <- data.frame(time = seq(from = 1, to = 40, by = 1), probs) %>%
+    # Pivot longer all columns _except_ `sidewalk_density`
+    pivot_longer(cols = -time,
+                 # The column names become a new column called "Mode"
+                 names_to = "Mode",
+                 # The values are gathered into a single column called
+                 # "Probability"
+                 values_to = "Probability")
+
+  probs %>%
+    # Create ggplot object; map `sidewalk_density` to the y-axis
+    # `Probability` to the x-axis, and the color of geometric
+    # objects to `Mode`
+    ggplot(aes(x = time, y = Probability, color = Mode)) +
+    # Add geometric object of type line with size = 1
+    geom_line(size = 1) +
+    labs(y = "Probability",
+         x = expression("time in min"))
+}
+
+# 1; Use model2 to calculate prob by in-sample median for travel times 20, 30 and 40 minutes
+estimate_by_time(model2)
+
+# 2; model for f3
+model3 <- mlogit(f3, mc_commute_long)
+summary(model3)
+estimate_by_time(model3)
+
+lrtest(model2, model3)
