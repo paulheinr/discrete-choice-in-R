@@ -365,3 +365,48 @@ o_model3 <- p_model3 %>%
                                 max_p == gr ~ "gr",
                                 max_p == hp ~ "hp"))
 table(o_model3)
+
+########### Excersises ###########
+#3
+ic_oc_mean <- Heating[1,]
+mean_cost <- Heating %>%
+  select(starts_with("ic") | starts_with("oc")) %>%
+  summarise(across(.cols = everything(),
+                   mean))
+ic_oc_mean[3:12] <- mean_cost
+
+# marginal effects
+effects(model3, covariate = "oc", type = "ra", data = mlogit.data(ic_oc_mean, shape = "wide", choice = "depvar", varying = 3:12))
+# elasticities
+effects(model3, covariate = "oc", type = "rr", data = mlogit.data(ic_oc_mean, shape = "wide", choice = "depvar", varying = 3:12))
+
+#4
+rabate <- function(rabate) {
+  H_rabate <- Heating %>%
+    mutate(ic.hp = rabate * ic.hp)
+  predicts <- predict(model3, newdata = mlogit.data(H_rabate, shape = "wide", choice = "depvar", varying = 3:12))
+  predicts_mean <- apply(predicts, 2, mean)
+  return(predicts_mean)
+}
+
+# calc rabate for 0.5 to 1 in 0.05 steps
+rabate_values <- seq(0.5, 1, 0.05)
+rabate_results <- sapply(rabate_values, rabate)
+colnames(rabate_results) <- rabate_values
+rabate_results["hp",]
+
+#5
+model4 <- mlogit(depvar ~ ic + oc | agehed,
+                 Heating,
+                 shape = "wide",
+                 choice = "depvar",
+                 reflevel = "er",
+                 varying = c(3:12))
+stargazer::stargazer(model4,
+                     type = "text",
+                     header = FALSE,
+                     single.row = TRUE,
+                     title = "Estimation results: Model 4")
+
+lrtest(model3, model4)
+# not a big difference (p-value > 0.05) so we can use the simpler model
